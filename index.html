@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prepaid ambalaža</title>
+    <!-- Dodane biblioteke za PDF generiranje -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        /* Uklonjen stil za header */
+
+        main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 48px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 64px;
+        }
+
+        section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-header {
+            margin-bottom: 32px;
+        }
+
+        .section-header h2 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        .section-header p {
+            font-size: 1.125rem;
+            color: #64748b;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            padding: 24px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .card-content {
+            padding: 24px;
+            padding-top: 0;
+        }
+
+        .card-text {
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge-primary {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-purple {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .process-card {
+            display: flex;
+            flex-direction: row;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+            margin-bottom: 16px;
+        }
+
+        .process-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .process-number {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 24px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .process-number-value {
+            font-size: 2.25rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .process-icon {
+            width: 32px;
+            height: 32px;
+        }
+
+        .process-content {
+            padding: 24px;
+            flex: 1;
+        }
+
+        .process-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .process-description {
+            color: #64748b;
+            margin-bottom: 16px;
+        }
+
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .feature-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .feature-box h3 {
+            color: #1e3a8a;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .feature-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            color: #2563eb;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        .feature-text h4 {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .feature-text p {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .lifecycle {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: white;
+            padding: 32px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .lifecycle-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .lifecycle-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .lifecycle-issued {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .lifecycle-active {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .lifecycle-used {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .lifecycle-text {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        @media (min-width: 768px) {
+            .lifecycle {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .lifecycle-item {
+                flex: 1;
+            }
+
+            .lifecycle-arrow {
+                display: block;
+                font-size: 1.5rem;
+                color: #cbd5e1;
+                margin: 0 16px;
+            }
+        }
+
+        .lifecycle-arrow {
+            display: none;
+        }
+
+        .benefits-section {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border-radius: 8px;
+            padding: 32px;
+            color: white;
+        }
+
+        .benefits-section h2 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            margin-bottom: 24px;
+            color: white;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .benefit-item {
+            display: flex;
+            gap: 16px;
+        }
+
+        .benefit-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .benefit-text h3 {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .benefit-text p {
+            color: #dbeafe;
+            font-size: 0.875rem;
+        }
+
+        footer {
+            background: #0f172a;
+            color: #94a3b8;
+            margin-top: 64px;
+            padding: 32px 16px;
+            border-top: 1px solid #1e293b;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .footer-text {
+            margin-bottom: 8px;
+        }
+
+        .footer-copyright {
+            font-size: 0.875rem;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 768px) {
+            /* Uklonjen stil za h1 u headeru */
+
+            .section-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .process-card {
+                flex-direction: column;
+            }
+
+            .process-number {
+                min-width: auto;
+                padding: 16px;
+                flex-direction: row;
+                gap: 12px;
+            }
+
+            .process-number-value {
+                margin-bottom: 0;
+            }
+
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .benefits-section {
+                padding: 24px;
+            }
+
+            .benefits-section h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .icon-svg {
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .security-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .security-card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        .security-card-text {
+            color: #64748b;
+            margin-bottom: 12px;
+            font-size: 0.875rem;
+        }
+
+        /* DODANI STILOVI ZA PDF TIPKU I MODAL */
+        #pdf-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1d4ed8;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        #pdf-button:hover {
+            background-color: #2563eb;
+            transform: scale(1.05);
+        }
+        #pdf-button:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+        #pdf-button .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #ffffff;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        #pdf-button.loading .spinner {
+            display: block;
+        }
+        #pdf-button.loading .text {
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #error-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        #error-modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        #error-modal-content p {
+            color: #1e293b;
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+        #error-modal-close {
+            background-color: #1d4ed8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        #error-modal-close:hover {
+             background-color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header - UKLONJEN -->
+    <!--
+    <header>
+        <div class="header-content">
+            <h1>Prepaid ambalaža</h1>
+            <p class="subtitle">Potpuno rješenje za sigurnu, pracljivu prepaid pošiljku</p>
+        </div>
+    </header>
+    -->
+
+    <main>
+        <!-- Product Overview Section -->
+        <section>
+            <div class="section-header">
+                <h2>Pregled proizvoda</h2>
+                <p>Gotove kutije i omotnice dostupne u više veličina sa unaprijed ispisanim jedinstvenim barcode-ima i QR kodovima.</p>
+            </div>
+
+            <div class="grid-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title" style="color: #2563eb;">XS</div>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-text">Mali dokumenti i laki predmeti</p>
+                        <!-- Dodano: Dimenzije -->
+                        <p class="card-text" style="font-size: 0.875rem; color: #475569;">Dimenzije: 14x32x7 cm (ŠxDxV)</p>
+                        <span class="badge badge-primary">Mali</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title" style="color: #2563eb;">S</div>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-text">Standardni mali paketi</p>
+                        <!-- Dodano: Dimenzije -->
+                        <p class="card-text" style="font-size: 0.875rem; color: #475569;">Dimenzije: 25x32x7 cm (ŠxDxV)</p>
+                        <span class="badge badge-primary">Mali</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title" style="color: #2563eb;">M</div>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-text">Srednji paketi i pošiljke</p>
+                        <!-- Dodano: Dimenzije -->
+                        <p class="card-text" style="font-size: 0.875rem; color: #475569;">Dimenzije: 25x32x15 cm (ŠxDxV)</p>
+                        <span class="badge badge-primary">Srednji</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title" style="color: #2563eb;">L</div>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-text">Veliki paketi</p>
+                        <!-- Dodano: Dimenzije -->
+                        <p class="card-text" style="font-size: 0.875rem; color: #475569;">Dimenzije: 32x48x32 cm (ŠxDxV)</p>
+                        <span class="badge badge-primary">Veliki</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-box">
+                <h3>Što sadrži svaka ambalaža</h3>
+                <div class="two-column">
+                    <div class="feature-item">
+                        <svg class="feature-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                        <div class="feature-text">
+                            <h4>Jedinstveni barkod</h4>
+                            <p>Unaprijed ispisan i registriran u bazi HP-a</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <svg class="feature-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm0 8h8v-8H3v8zm10 0h8V11h-8v8zm0-18v8h8V3h-8z"/></svg>
+                        <div class="feature-text">
+                            <h4>QR Kod</h4>
+                            <p>Vodi na web sučelje za unos podataka</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <svg class="feature-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        <div class="feature-text">
+                            <h4>Polje za adresu</h4>
+                            <p>Prostor za adresu ili ispis etikete</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <svg class="feature-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm11 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+                        <div class="feature-text">
+                            <h4>Poštarina uključena</h4>
+                            <p>Trošak dostave uključen u cijenu</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Process Flow Section -->
+        <section>
+            <div class="section-header">
+                <h2>Kompletan tok procesa</h2>
+                <p>Od kupnje do dostave</p>
+            </div>
+
+            <div class="process-card">
+                <div class="process-number">
+                    <div class="process-number-value">1</div>
+                    <svg class="process-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                </div>
+                <div class="process-content">
+                    <h3 class="process-title">Kupnja</h3>
+                    <p class="process-description">Kupac kupuje odabranu veličinu prepaid kutije ili omotnice (S, M, L, XL).</p>
+                    <div class="badge-list">
+                        <span class="badge badge-secondary">Dostupno na šalterima</span>
+                        <span class="badge badge-secondary">Web-shop</span>
+                        <span class="badge badge-secondary">Dostupno više veličina</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-card">
+                <div class="process-number">
+                    <div class="process-number-value">2</div>
+                    <svg class="process-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm0 8h8v-8H3v8zm10 0h8V11h-8v8zm0-18v8h8V3h-8z"/></svg>
+                </div>
+                <div class="process-content">
+                    <h3 class="process-title">Kreiranje pošiljke</h3>
+                    <p class="process-description">
+                        Korisnik ima dvije mogućnosti:
+                        <br>1. <strong>Skeniranje QR koda:</strong> Kreira pošiljku na web sučelju (unos podataka primatelja/pošiljatelja) i povezuje barkod s pošiljkom.
+                        <br>2. <strong>Bez unosa podataka:</strong> Preskače korak s QR kodom i nosi zapakiranu ambalažu izravno u poštanski ured.
+                    </p>
+                    <div class="badge-list">
+                        <span class="badge badge-primary">Opcija 1: Skeniraj QR kod</span>
+                        <span class="badge badge-primary">Opcija 1: Poveži barkod online</span>
+                        <span class="badge badge-secondary">Opcija 2: Bez unosa (samo pakiranje)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UKLONJEN KORAK 3 (Pakiranje) -->
+
+            <div class="process-card">
+                <div class="process-number">
+                    <div class="process-number-value">3</div>
+                    <svg class="process-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V9l-7-7zM9 19H7v-2h2v2zm0-4H7v-2h2v2zm0-4H7V9h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V9h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2z"/></svg>
+                </div>
+                <div class="process-content">
+                    <h3 class="process-title">Predaja pošiljke</h3>
+                    <p class="process-description">
+                        <strong>Ako su podaci uneseni (Opcija 1):</strong> Pošiljka se predaje na PUDO točkama (PU, brzi šalter, paketomat, self drop-off). Skeniranjem barkoda status postaje 'zaprimljen'. Korisnik može (ali ne mora) ispisati/upisati podatke o primatelju, jer su svi podaci vezani na barkod u sustavu i dostava je moguća bez fizičke adresnice.
+                        <br><strong>Ako podaci NISU uneseni (Opcija 2):</strong> Pošiljka se <u>mora</u> predati u poštanskom uredu (PU). Djelatnik kreira pošiljku, oprema je adresnicom i izdaje korisniku potvrdu o predaji.
+                    </p>
+                    <div class="badge-list">
+                        <span class="badge badge-primary">Opcija 1: PUDO točke (sve)</span>
+                        <span class="badge badge-primary">Opcija 1: Samoposlužno skeniranje</span>
+                        <span class="badge badge-primary">Opcija 1: Dostava bez adresnice</span>
+                        <span class="badge badge-secondary">Opcija 2: Obavezna predaja u PU</span>
+                        <span class="badge badge-secondary">Opcija 2: Djelatnik kreira pošiljku</span>
+                        <span class="badge badge-secondary">Izdavanje potvrde o predaji</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-card">
+                <div class="process-number">
+                    <div class="process-number-value">4</div>
+                    <svg class="process-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm11 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+                </div>
+                <div class="process-content">
+                    <h3 class="process-title">Sortiranje i dostava</h3>
+                    <p class="process-description">Pošiljka prolazi standardni proces sortiranja i dostave sa aktivnim praćenjem statusa preko jedinstvenog barkode broja.</p>
+                    <div class="badge-list">
+                        <span class="badge badge-secondary">Standardno sortiranje</span>
+                        <span class="badge badge-secondary">Aktivno praćenje</span>
+                        <span class="badge badge-secondary">Ažuriranje statusa u realnom vremenu</span>
+                        <span class="badge badge-secondary">Dostava primatelju</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-card">
+                <div class="process-number">
+                    <div class="process-number-value">5</div>
+                    <svg class="process-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <div class="process-content">
+                    <h3 class="process-title">Dostavljeno</h3>
+                    <p class="process-description">Nakon dodjele konačnog statusa pošiljci, barkod broj prelazi u 'uručeno' i zaključava se, onemogućujući ponovnu upotrebu.</p>
+                    <div class="badge-list">
+                        <span class="badge badge-secondary">Status se mijenja na 'uručeno'</span>
+                        <span class="badge badge-secondary">Barkode zaključan</span>
+                        <span class="badge badge-secondary">Dostava potvrđena</span>
+                        <span class="badge badge-secondary">Praćenje završeno</span>
+			<span class="badge badge-secondary">Uručeno primatelju</span>
+			<span class="badge badge-secondary">Uručeno pošiljatelju</span>
+			<span class="badge badge-secondary">Pošiljka neuručiva</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-card">
+                <div class="process-number">
+                    <div class="process-number-value">6</div>
+                    <svg class="process-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.29 7.78-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                </div>
+                <div class="process-content">
+                    <h3 class="process-title">Sprječavanje ponovne upotrebe</h3>
+                    <p class="process-description">Ako netko pokuša ponovno koristiti isti barkode, backend vraća grešku 'barkode iskorišten', osiguravajući sigurnost i sprječavajući zlouporabu.</p>
+                    <div class="badge-list">
+                        <span class="badge badge-secondary">Validacija backenda</span>
+                        <span class="badge badge-secondary">Greška pri ponovnoj upotrebi</span>
+                        <span class="badge badge-secondary">Sprječavanje prijevare</span>
+                        <span class="badge badge-secondary">Jamstvo jednokratne upotrebe</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Delivery & Submission Options -->
+        <section>
+            <div class="section-header">
+                <h2>Opcije dostave i predaje</h2>
+                <p>Fleksibilni izbor</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">⚡ Predaja</div>
+                    </div>
+                    <div class="card-content">
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #475569;">
+                                <span style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%;"></span>
+                                Self drop-off
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #475569;">
+                                <span style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%;"></span>
+                                Poštanski ured (PU)
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #475569;">
+                                <span style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%;"></span>
+                                Brzi šalter
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 8px; color: #475569;">
+                                <span style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%;"></span>
+                                Paketomat
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">🚚 Dostava</div>
+                    </div>
+                    <div class="card-content">
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #475569;">
+                                <span style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%;"></span>
+                                Poštanski ured (PU)
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #475569;">
+                                <span style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%;"></span>
+                                Brzi šalter
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Architecture -->
+        <section>
+            <div class="section-header">
+                <h2>Tehnička arhitektura</h2>
+                <p>Sigurna, skalabilna infrastruktura</p>
+            </div>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div class="card-title">Jedinstveni barkod</div>
+                            <svg style="width: 20px; height: 20px; color: #cbd5e1;" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                        </div>
+                        <p style="font-size: 0.75rem; font-family: monospace; color: #2563eb; margin-top: 8px;">LD123456789HR</p>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-text">Barkode format kompatibilan sa HP standardima</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div class="card-title">Prepaid registar</div>
+                            <svg style="width: 20px; height: 20px; color: #cbd5e1;" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                        </div>
+                        <p style="font-size: 0.75rem; font-family: monospace; color: #2563eb; margin-top: 8px;">Centralna backend tablica</p>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-text">Status tok: zadužen → zaprimljen → uručen. Rezervirani brojevi sa upravljanjem stanja.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div class="card-title">Skeniranje na predaji</div>
+                            <svg style="width: 20px; height: 20px; color: #cbd5e1;" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                        </div>
+                        <p style="font-size: 0.75rem; font-family: monospace; color: #2563eb; margin-top: 8px;">Aktivacija statusa</p>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-text">Aktivira status barkoda. Zaključava barkod nakon evidencije predaje.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div class="card-title">Void mehanizam</div>
+                            <svg style="width: 20px; height: 20px; color: #cbd5e1;" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.29 7.78-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                        </div>
+                        <p style="font-size: 0.75rem; font-family: monospace; color: #2563eb; margin-top: 8px;">Validacija backenda</p>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-text">Sprječava ponovnu upotrebu istog barcode-a. Backend odbija duplirane barcode brojeve.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div class="card-title">Integracija praćenja</div>
+                            <svg style="width: 20px; height: 20px; color: #cbd5e1;" fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm11 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+                        </div>
+                        <p style="font-size: 0.75rem; font-family: monospace; color: #2563eb; margin-top: 8px;">Standardni sustav</p>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-text">Status barkoda ulazi u standardni sustav praćenja. Korisnik prati pošiljku preko barkoda.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Status Lifecycle -->
+        <section>
+            <div class="section-header">
+                <h2>Životni ciklus prepaid ambalaže</h2>
+                <p>Potpuno praćenje od kupnje do dostave</p>
+            </div>
+
+            <div class="lifecycle">
+                <div class="lifecycle-item">
+                    <div class="lifecycle-badge lifecycle-issued">IZDANO</div>
+                    <p class="lifecycle-text">Ambalaža izrađena, barkod registriran</p>
+                </div>
+                <div class="lifecycle-arrow">→</div>
+                <div class="lifecycle-item">
+                    <div class="lifecycle-badge lifecycle-active">AKTIVNO</div>
+                    <p class="lifecycle-text">Barkod skeniran na točki predaje</p>
+                </div>
+                <div class="lifecycle-arrow">→</div>
+                <div class="lifecycle-item">
+                    <div class="lifecycle-badge lifecycle-used">ISKORIŠTENO</div>
+                    <p class="lifecycle-text">Dostavljeno, barkod trajno zaključan</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Features -->
+        <section>
+            <div class="section-header">
+                <h2>Sigurnost i sprječavanje prijevare</h2>
+                <p>Ugrađene zaštite osiguravaju jednokratnu upotrebu i sprječavaju zlouporabu</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="security-card">
+                    <div class="security-card-title">
+                        <span style="color: #16a34a;">✓</span>
+                        Jamstvo jednokratne upotrebe
+                    </div>
+                    <p class="security-card-text">Nakon dostave barkod se trajno zaključava i ne može se ponovno koristiti. Svaki barkod validan je za točno jednu pošiljku.</p>
+                    <span class="badge badge-success">Sprječavanje prijevare</span>
+                </div>
+
+                <div class="security-card">
+                    <div class="security-card-title">
+                        <span style="color: #dc2626;">🔒</span>
+                        Void mehanizam
+                    </div>
+                    <p class="security-card-text">Backend automatski odbija bilo koji pokušaj ponovne upotrebe barkoda. Poruka greške: "Barkod već iskorišten" sprječava duplirane pošiljke.</p>
+                    <span class="badge badge-danger">Validacija backenda</span>
+                </div>
+
+                <div class="security-card">
+                    <div class="security-card-title">
+                        <span style="color: #9333ea;">⏱</span>
+                        Praćenje statusa
+                    </div>
+                    <p class="security-card-text">Ažuriranje statusa u realnom vremenu kroz sustav praćenja. Korisnici mogu pratiti pošiljku na svakom koraku od predaje do dostave.</p>
+                    <span class="badge badge-purple">Ažuriranja u realnom vremenu</span>
+                </div>
+
+                <div class="security-card">
+                    <div class="security-card-title">
+                        <span style="color: #2563eb;">📊</span>
+                        Jedinstveni identifikatori
+                    </div>
+                    <p class="security-card-text">Svaki barkod slijedi format LD123456789HR i registrirana je rezervacija u sustavu. Nema mogućnosti za duplikate.</p>
+                    <span class="badge badge-primary">Centralni registar</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefits Section -->
+        <div class="benefits-section">
+            <h2>Zašto odabrati prepaid ambalažu?</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <svg class="benefit-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    <div class="benefit-text">
+                        <h3>Brzo i jednostavno</h3>
+                        <p>Kupnja, skeniranje QR koda i slanje - bez kompliciranih procedura</p>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <svg class="benefit-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.9c.7-.23 1.11-.92 1.11-1.71 0-1.02-.79-1.84-1.78-1.98V7h-1v1.11C9.69 8.28 9 9.15 9 10.19c0 .76.38 1.43 1 1.76L7 16h1.74l.95-3.56.95 3.56H12l-1.69-6.09c.11-.03.22-.05.34-.08.18-.04.36-.06.55-.06.37 0 .72.07 1.04.19z"/></svg>
+                    <div class="benefit-text">
+                        <h3>Cijena</h3>
+                        <p>Jefitnije slanje u tipiziranoj ambalaži</p>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <svg class="benefit-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm11 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+                    <div class="benefit-text">
+                        <h3>Fleksibilna dostava</h3>
+                        <p>Više opcija predaje i dostave prilagođeno vašim potrebama</p>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <svg class="benefit-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 5V1h-1v4H8.01V1H7v4H3.99V1h-1v4H1v14h22V5h-2.01V1h-1v4zm10 12H2V8h19.99z"/></svg>
+                    <div class="benefit-text">
+                        <h3>Potpuno praćenje</h3>
+                        <p>Praćenje u realnom vremenu od predaje do dostave</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- DODANA PDF TIPKA -->
+    <button id="pdf-button" title="Generiraj PDF">
+        <span class="text">PDF</span>
+        <div class="spinner"></div>
+    </button>
+
+    <!-- DODAN MODAL ZA GREŠKE -->
+    <div id="error-modal">
+        <div id="error-modal-content">
+            <p id="error-message"></p>
+            <button id="error-modal-close">Zatvori</button>
+        </div>
+    </div>
+    
+    <!-- DODANA SKRIPTA ZA PDF GENERIRANJE -->
+    <script>
+        // Postavljanje event listenera nakon što se DOM učita
+        document.addEventListener('DOMContentLoaded', (event) => {
+            
+            const pdfButton = document.getElementById('pdf-button');
+            const errorModal = document.getElementById('error-modal');
+            const errorMessage = document.getElementById('error-message');
+            const errorModalClose = document.getElementById('error-modal-close');
+
+            // Funkcija za prikaz modala s greškom
+            function showErrorModal(message) {
+                errorMessage.textContent = message;
+                errorModal.style.display = 'flex';
+            }
+
+            // Zatvaranje modala
+            errorModalClose.onclick = function() {
+                errorModal.style.display = 'none';
+            }
+
+            // Klik na PDF tipku
+            pdfButton.addEventListener('click', function() {
+                // 0. Postavi alias i dohvati elemente
+                window.jsPDF = window.jspdf.jsPDF;
+                const mainContent = document.querySelector('main');
+                const originalTitle = document.title; // Dohvati naslov stranice
+
+                // 1. Prikaži stanje učitavanja
+                pdfButton.classList.add('loading');
+                pdfButton.disabled = true;
+
+                // 2. Koristi html2canvas za snimanje <main> elementa
+                html2canvas(mainContent, {
+                    scale: 2, // Povećaj rezoluciju za bolju kvalitetu
+                    useCORS: true,
+                    logging: false,
+                    onclone: (doc) => {
+                        // Ova funkcija se izvršava na kloniranom dokumentu PRIJE snimanja
+                        // Ovdje skrivamo samu PDF tipku da se ne pojavi na snimci
+                        let buttonInClone = doc.getElementById('pdf-button');
+                        if (buttonInClone) {
+                            buttonInClone.style.display = 'none';
+                        }
+                    }
+                }).then(canvas => {
+                    try {
+                        // 3. Dohvati podatke sa snimljenog platna (canvas)
+                        const imgData = canvas.toDataURL('image/png');
+                        const imgWidth = canvas.width;
+                        const imgHeight = canvas.height;
+
+                        // 4. Postavi jsPDF
+                        // A4 stranica: 210mm širine x 297mm visine
+                        const doc = new jsPDF('p', 'mm', 'a4');
+                        const pageWidth = doc.internal.pageSize.getWidth(); // 210
+                        const pageHeight = doc.internal.pageSize.getHeight(); // 297
+
+                        // 5. Izračunaj dimenzije
+                        // Skaliraj sliku da odgovara širini stranice
+                        const imgRatio = imgWidth / pageWidth;
+                        const canvasHeightInMM = imgHeight / imgRatio;
+
+                        let heightLeft = canvasHeightInMM;
+                        let position = 0; // y-pozicija slike na PDF-u
+
+                        // 6. Dodaj prvu stranicu
+                        doc.addImage(imgData, 'PNG', 0, position, pageWidth, canvasHeightInMM);
+                        heightLeft -= pageHeight;
+
+                        // 7. Dodaj nove stranice ako sadržaj prelazi visinu jedne stranice
+                        while (heightLeft > 0) {
+                            position = position - pageHeight; // Pomiči sliku "gore" na idućoj stranici
+                            doc.addPage();
+                            doc.addImage(imgData, 'PNG', 0, position, pageWidth, canvasHeightInMM);
+                            heightLeft -= pageHeight;
+                        }
+
+                        // 8. Spremi PDF
+                        // Generiraj sigurno ime datoteke iz naslova stranice
+                        const filename = (originalTitle || 'prepaid-ambalaza').toLowerCase().replace(/[^a-z0-9]/g, '-') + '.pdf';
+                        doc.save(filename);
+
+                    } catch (error) {
+                        console.error('Greška prilikom generiranja PDF-a:', error);
+                        showErrorModal('Došlo je do greške prilikom generiranja PDF-a.');
+                    } finally {
+                        // 9. Sakrij stanje učitavanja
+                        pdfButton.classList.remove('loading');
+                        pdfButton.disabled = false;
+                    }
+
+                }).catch(error => {
+                    console.error('Greška s html2canvas:', error);
+                    showErrorModal('Došlo je do greške prilikom snimanja stranice.');
+                    pdfButton.classList.remove('loading');
+                    pdfButton.disabled = false;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
