@@ -562,7 +562,7 @@
         <section>
             <div class="section-header">
                 <h2>Pregled proizvoda</h2>
-                <p>Gotove kutije i omotnice dostupne u više veličina sa unaprijed ispisanim jedinstvenim barcode-ima i QR kodovima.</p>
+                <p>Gotove kutije i omotnice dostupne u više veličina sa unaprijed ispisanim jedinstvenim barkod brojevima i QR kodovima.</p>
             </div>
 
             <div class="grid-4">
@@ -1019,7 +1019,7 @@
         </div>
     </div>
     
-    <!-- DODANA SKRIPTA ZA PDF GENERIRANJE -->
+    <!-- AŽURIRANA SKRIPTA ZA PDF GENERIRANJE -->
     <script>
         // Postavljanje event listenera nakon što se DOM učita
         document.addEventListener('DOMContentLoaded', (event) => {
@@ -1053,7 +1053,7 @@
 
                 // 2. Koristi html2canvas za snimanje <main> elementa
                 html2canvas(mainContent, {
-                    scale: 2, // Povećaj rezoluciju za bolju kvalitetu
+                    scale: 2, // Zadržavamo visoku rezoluciju za oštrinu
                     useCORS: true,
                     logging: false,
                     onclone: (doc) => {
@@ -1066,8 +1066,9 @@
                     }
                 }).then(canvas => {
                     try {
-                        // 3. Dohvati podatke sa snimljenog platna (canvas)
-                        const imgData = canvas.toDataURL('image/png');
+                        // 3. Dohvati podatke kao JPEG visoke kvalitete (0.9 = 90%)
+                        // OVO JE GLAVNA PROMJENA (PNG -> JPEG)
+                        const imgData = canvas.toDataURL('image/jpeg', 0.9); 
                         const imgWidth = canvas.width;
                         const imgHeight = canvas.height;
 
@@ -1086,14 +1087,16 @@
                         let position = 0; // y-pozicija slike na PDF-u
 
                         // 6. Dodaj prvu stranicu
-                        doc.addImage(imgData, 'PNG', 0, position, pageWidth, canvasHeightInMM);
+                        // OVO JE DRUGA PROMJENA (format 'JPEG' i kompresija 'FAST')
+                        doc.addImage(imgData, 'JPEG', 0, position, pageWidth, canvasHeightInMM, undefined, 'FAST');
                         heightLeft -= pageHeight;
 
                         // 7. Dodaj nove stranice ako sadržaj prelazi visinu jedne stranice
                         while (heightLeft > 0) {
                             position = position - pageHeight; // Pomiči sliku "gore" na idućoj stranici
                             doc.addPage();
-                            doc.addImage(imgData, 'PNG', 0, position, pageWidth, canvasHeightInMM);
+                            // Dodajemo sliku i na nove stranice
+                            doc.addImage(imgData, 'JPEG', 0, position, pageWidth, canvasHeightInMM, undefined, 'FAST');
                             heightLeft -= pageHeight;
                         }
 
